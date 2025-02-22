@@ -73,3 +73,8 @@ wheels/
 logs/ 
 
 archive/
+
+# New additions from the code block
+*.env
+!.env.example
+*.pyc

@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 import pandas as pd
 from src.MovieAntiRecommender import MovieAntiRecommender
+from config import settings
 
 app = FastAPI()
 
@@ -9,7 +10,7 @@ class RecommendationRequest(BaseModel):
     movie_title: str
 
 recommender = MovieAntiRecommender()
-recommender.load_dataset("data/clustered_dataset.csv", "data/movies_kmeans.pkl")
+recommender.load_dataset(settings.data_path, settings.model_path)
 
 @app.post("/recommend")
 def recommend_movies(request: RecommendationRequest):
