@@ -11,7 +11,7 @@ COPY environment.yml .
 RUN conda env create -f environment.yml
 
 # Make RUN commands use the new environment
-SHELL ["conda", "run", "-n", "myenv", "/bin/bash", "-c"]
+SHELL ["conda", "run", "-n", "antirecommender", "/bin/bash", "-c"]
 
 # Copy the rest of the application
 COPY . .
@@ -20,4 +20,4 @@ COPY . .
 EXPOSE 8000
 
 # Command to run the application using run.py
-CMD ["conda", "run", "-n", "myenv", "python", "run.py"] 
+CMD ["conda", "run", "-n", "antirecommender", "python", "run.py"] 
