@@ -18,6 +18,6 @@ def recommend_movies(request: RecommendationRequest):
         recommendations = recommender.recommend(request.movie_title)
         return {"recommendations": recommendations}
     except ValueError as e:
-        return {"error": str(e)}, 404
+        return {"error": str(e)}
     except Exception as e:
-        return {"error": "An unexpected error occurred"}, 500
+        return {"error": "An unexpected error occurred"}
