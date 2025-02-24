@@ -17,9 +17,8 @@ class MovieAntiRecommender:
         self.model = joblib.load(model_name)
         self.rating_quantiles = self.dataset['rating'].quantile([0.25, 0.75, 0.97]).to_numpy()
 
-        assert self.dataset.shape[0] == self.model.labels_.shape[0], "Dataset and model labels have different number of rows"
-        
-    
+        assert self.dataset.shape[0] == self.model.labels_.shape[0], "Dataset \
+                                and model labels have different number of rows"
 
     def standardize_title(self, movie_title, year=None):
 
@@ -31,8 +30,10 @@ class MovieAntiRecommender:
 
         movie_titles = self.dataset['standardized_title'].values
 
-        # zeroth try: exact match if query is directly the name of the movie with proper spelling up to a case difference
-        matching_titles = self.dataset[self.dataset['standardized_title'].str.lower() == movie_title.lower()]
+        # zeroth try: exact match if query is directly the name of
+        # the movie with proper spelling up to a case difference
+        matching_condition = self.dataset['standardized_title'].str.lower() == movie_title.lower()
+        matching_titles = self.dataset[matching_condition]
         matching_titles_ids = matching_titles.index
         # print(matching_titles)
 
@@ -47,19 +48,20 @@ class MovieAntiRecommender:
                 }
         elif len(matching_titles) == 1 and year is None:
             return matching_titles.index
-        
+
         # First try: exact match after lowercasing for movies which contains the query
         matching_titles = np.array([str(title) for title in movie_titles if movie_title.lower() in title.lower()])
         matching_titles_ids = self.dataset[self.dataset['standardized_title'].isin(matching_titles)].index
-        
+
         # Second try: find close matches with low threshold
         if not np.any(matching_titles):
             print("No exact match found. Searching for close matches...")
             matches = get_close_matches(movie_title.lower(), [t.lower() for t in movie_titles], n=5, cutoff=0.6)
             matching_titles = np.array([title for title in movie_titles if title.lower() in matches])
             matching_titles_ids = self.dataset[self.dataset['standardized_title'].isin(matching_titles)].index
-        
-        matching_titles_years = np.int32(self.dataset[self.dataset['standardized_title'].isin(matching_titles)]['year'].values)
+
+        matching_titles_years = self.dataset[self.dataset['standardized_title'].isin(matching_titles)]['year'].values
+        matching_titles_years = np.int32(matching_titles_years)
 
         # If year is provided, filter matches by exact year
         if year is not None:
@@ -78,29 +80,26 @@ class MovieAntiRecommender:
         else:
             return self.dataset[self.dataset['standardized_title'] == matching_titles[0]].index
 
-
     def recommend(self, movie_title, year=None):
 
         movie_idx = self.standardize_title(movie_title, year)
 
         if isinstance(movie_idx, dict):
             return movie_idx
-            
+
         movie_cluster = self.model.labels_[movie_idx]
         movie_cluster_center = self.model.cluster_centers_[movie_cluster]
-        
+
         cluster_distances = np.linalg.norm(movie_cluster_center.reshape(1, -1) - self.model.cluster_centers_, axis=1)
         farthers_cluster_idx = np.argmax(cluster_distances)
-        farthers_cluster_center = self.model.cluster_centers_[farthers_cluster_idx]
 
+        possible_movies_low = self.dataset[(self.model.labels_ == farthers_cluster_idx) &
+                                           (self.dataset["rating"] < self.rating_quantiles[0])]
+        possible_movies_mid = self.dataset[(self.model.labels_ == farthers_cluster_idx) &
+                                           (self.dataset["rating"] > self.rating_quantiles[1])]
+        possible_movies_high = self.dataset[(self.model.labels_ == farthers_cluster_idx) &
+                                            (self.dataset["rating"] > self.rating_quantiles[2])]
 
-        possible_movies_low = self.dataset[(self.model.labels_ == farthers_cluster_idx) & 
-                                       (self.dataset["rating"] < self.rating_quantiles[0])]
-        possible_movies_mid = self.dataset[(self.model.labels_ == farthers_cluster_idx) & 
-                                       (self.dataset["rating"] > self.rating_quantiles[1])]
-        possible_movies_high = self.dataset[(self.model.labels_ == farthers_cluster_idx) & 
-                                       (self.dataset["rating"] > self.rating_quantiles[2])]
-        
         if len(possible_movies_low) > 0:
             movie_low = possible_movies_low.sample(1)
         else:
