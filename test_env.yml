@@ -1,0 +1,13 @@
+name: test_env
+channels:
+  - conda-forge
+dependencies:
+  - python=3.10
+  - numpy
+  - matplotlib 
+  - scikit-learn
+  - pytest
+  - fastapi
+  - joblib
+  - pandas
+  - pydantic-settings
