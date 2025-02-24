@@ -13,41 +13,44 @@ def mock_recommendations():
         {"title": "Movie 3", "rating": 4.8, "year": 2015},
     ]}
 
+
 @pytest.fixture
 def mock_recommender():
-    with patch('main.recommender') as mock_recommender:  
-        mock_recommender.recommend.return_value = [
-            {
-                "title": "Mocked Movie 1",
-                "rating": 8.5,
-                "genres": "Action|Adventure"
-            }
-        ]
-        yield mock_recommender
+    with patch('main.recommender.recommend') as mock_method:
+        mock_method.return_value = {
+            "recommendations": [
+                {
+                    "title": "Mocked Movie 1",
+                    "rating": 1.5,
+                    "year": 2000
+                }
+            ]
+        }
+        yield mock_method
 
 def test_recommend_movies_success(mock_recommender):
-    response = client.post("/recommend", json={"movie_title": "Test Movie"})
-    print("Response status:", response.status_code)
-    print("Response body:", response.json())
-    assert response.status_code == 200
-    mock_recommender.recommend.assert_called_once_with("Test Movie")
-
-def test_recommend_movies_not_found(mock_recommender):
-    mock_recommender.recommend.side_effect = ValueError("Movie 'Invalid Movie' not found in the dataset.")
-
     response = client.post(
         "/recommend",
-        json={"movie_title": "Invalid Movie"}
+        json={"movie_title": "Test Movie", "year": 2000}
     )
+    
+    assert response.status_code == 200
+    assert "recommendations" in response.json()
+    mock_recommender.assert_called_once_with("Test Movie", 2000)
 
-    # Assert response
+def test_recommend_movies_not_found(mock_recommender):
+    mock_recommender.side_effect = ValueError("Movie 'Invalid Movie' not found in the dataset.")
+    
+    response = client.post("/recommend", json={"movie_title": "Invalid Movie", "year": None})
+    print(response.json())
     assert response.status_code == 200
     assert response.json() == {"error": "Movie 'Invalid Movie' not found in the dataset."}
+    mock_recommender.assert_called_once_with("Invalid Movie", None)
 
 def test_recommend_movies_invalid_request():
     response = client.post(
         "/recommend",
         json={}
     )
-
+    
     assert response.status_code == 422 

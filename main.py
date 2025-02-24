@@ -16,7 +16,7 @@ recommender.load_dataset(settings.data_path, settings.model_path)
 @app.post("/recommend")
 def recommend_movies(request: RecommendationRequest):
     try:
-        recommendations = recommender.recommend(str(request.movie_title), int(request.year))
+        recommendations = recommender.recommend(str(request.movie_title), request.year)
         return recommendations
     except ValueError as e:
         return {"error": str(e)}
