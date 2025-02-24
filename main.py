@@ -8,6 +8,7 @@ app = FastAPI()
 
 class RecommendationRequest(BaseModel):
     movie_title: str
+    year: int | None = None
 
 recommender = MovieAntiRecommender()
 recommender.load_dataset(settings.data_path, settings.model_path)
@@ -15,8 +16,8 @@ recommender.load_dataset(settings.data_path, settings.model_path)
 @app.post("/recommend")
 def recommend_movies(request: RecommendationRequest):
     try:
-        recommendations = recommender.recommend(request.movie_title)
-        return {"recommendations": recommendations}
+        recommendations = recommender.recommend(request.movie_title, request.year)
+        return recommendations
     except ValueError as e:
         return {"error": str(e)}
     except Exception as e:
