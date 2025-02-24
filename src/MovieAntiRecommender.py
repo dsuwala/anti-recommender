@@ -82,7 +82,6 @@ class MovieAntiRecommender:
     def recommend(self, movie_title, year=None):
 
         movie_idx = self.standardize_title(movie_title, year)
-        print(movie_idx)
 
         if isinstance(movie_idx, dict):
             return movie_idx
@@ -119,7 +118,7 @@ class MovieAntiRecommender:
 
         recommendations = pd.concat([movie_low, movie_mid, movie_high])
 
-        recommendations = recommendations.drop(['cluster', 'movieId'], axis=1)
+        recommendations = recommendations.drop(['movieId'], axis=1)
         recommendations = recommendations.to_dict(orient='records')
         recommendations = {"recommendations": recommendations}
 
