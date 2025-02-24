@@ -49,8 +49,6 @@ class MovieAntiRecommender:
         matching_titles = np.array([str(title) for title in movie_titles if movie_title.lower() in title.lower()])
         matching_titles_ids = self.dataset[self.dataset['standardized_title'].isin(matching_titles)].index
         
-        # print("first try:", matching_titles)
-
         # Second try: find close matches with low threshold
         if not np.any(matching_titles):
             print("No exact match found. Searching for close matches...")
@@ -62,11 +60,8 @@ class MovieAntiRecommender:
 
         # If year is provided, filter matches by exact year
         if year is not None:
-            # print("Filtering by year...")
             matching_titles = matching_titles[matching_titles_years == int(year)]
             matching_titles_ids = matching_titles_ids[matching_titles_years == int(year)]
-            # print("second try:", matching_titles)
-            # print("second try ids:", matching_titles_ids)
 
         if len(matching_titles) != 1:
 
@@ -89,9 +84,6 @@ class MovieAntiRecommender:
         if isinstance(movie_idx, dict):
             return movie_idx
             
-        # Use the single match found
-        # movie_title = matching_titles[0]
-        
         movie_cluster = self.model.labels_[movie_idx]
         movie_cluster_center = self.model.cluster_centers_[movie_cluster]
         
