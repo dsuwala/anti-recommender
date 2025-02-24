@@ -1,0 +1,51 @@
+movieId,title,genres,rating,standardized_title,year
+1,Movie 1,Action|Sci-Fi,4.5,movie 1,2010
+2,Movie 1: Extended,Action|Sci-Fi,4.0,movie 1 extended,2013
+3,Movie 2,Drama|Romance,4.2,movie 2,2005
+4,Movie 2,Drama|Romance,4.3,movie 2,2015
+5,Movie 2,Drama|Romance,4.1,movie 2,2020
+6,Movie 3: Chapter One,Action|Adventure|Sci-Fi,4.8,movie 3 chapter one,2008
+7,Movie 3: Chapter Two,Action|Adventure|Sci-Fi,4.9,movie 3 chapter two,2011
+8,Movie 4: Beginning,Adventure|Fantasy,4.7,movie 4 beginning,2001
+9,Movie 4: Middle,Adventure|Fantasy,4.8,movie 4 middle,2002
+10,Movie 4: Ending,Adventure|Fantasy,4.9,movie 4 ending,2003
+11,Movie 5,Action|Sci-Fi|Thriller,4.6,movie 5,2010
+12,Movie 6,Action|Crime|Drama,4.8,movie 6,2008
+13,Movie 7,Crime|Drama,4.7,movie 7,2004
+14,Movie 8,Drama|Romance,4.5,movie 8,2014
+15,Movie 9,Drama,4.9,movie 9,2004
+16,Movie 10,Action|Adventure|Sci-Fi,4.4,movie 10,2003
+17,Movie 10,Adventure|Sci-Fi,3.9,movie 10,2015
+18,Movie 11,Drama|Romance,4.3,movie 11,2007
+19,Movie 12,Crime|Drama,4.8,movie 12,2012
+20,Movie 13,Crime|Thriller,4.6,movie 13,2011
+21,Movie 14,Action|Drama,4.5,movie 14,2010
+22,Movie 15,Crime|Drama|Fantasy,4.7,movie 15,2009
+23,Movie 16,Drama,4.6,movie 16,2009
+24,Movie 17,Drama|Thriller,4.4,movie 17,2009
+25,Movie 18,Drama|War,4.7,movie 18,2008
+26,Movie 19,Biography|Drama|History,4.8,movie 19,2013
+27,Movie 20,Animation|Adventure|Drama,4.6,movie 20,2004
+28,Movie 20,Animation|Adventure|Drama,4.0,movie 20,2019
+29,Movie 21,Biography|Crime|Drama,4.7,movie 21,2010
+30,Movie 22,Crime|Drama|Thriller,4.5,movie 22,2016
+31,Movie 23,Action|Adventure|Fantasy,4.3,movie 23,2009
+32,Movie 23: Sequel,Action|Adventure|Fantasy,4.1,movie 23 sequel,2022
+33,Movie 24,Action|Sci-Fi,4.4,movie 24,2014
+34,Movie 24: Part 2,Action|Sci-Fi,4.7,movie 24 part 2,2017
+35,Movie 25,Adventure|Comedy|Sci-Fi,4.6,movie 25,2015
+36,Movie 26: Origins,Action|Adventure,4.7,movie 26 origins,2011
+37,Movie 27,Adventure|Fantasy|Romance,4.5,movie 27,2007
+38,Movie 28,Horror|Sci-Fi,4.6,movie 28,2009
+39,Movie 28: Return,Action|Sci-Fi,4.7,movie 28 return,2016
+40,Movie 29,Comedy|Drama,4.3,movie 29,2015
+41,Movie 30,Action|Thriller,4.5,movie 30,2018
+42,Movie 31,Comedy|Crime,4.4,movie 31,2008
+43,Movie 32,Comedy|Fantasy|Romance,4.5,movie 32,2013
+44,Movie 33,Drama|Horror,4.6,movie 33,2010
+45,Movie 33,Horror|Thriller,3.8,movie 33,2019
+46,Movie 34,Action|Sci-Fi,4.5,movie 34,2012
+47,Movie 34: Next,Action|Drama|Sci-Fi,4.4,movie 34 next,2017
+48,Movie 35,Adventure|Family|Fantasy,4.4,movie 35,2009
+49,Movie 36,Drama|History|Romance,4.5,movie 36,2019
+50,Movie 37,Drama|Romance|War,4.7,movie 37,2012
