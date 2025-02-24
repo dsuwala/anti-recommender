@@ -6,7 +6,7 @@ from src.MovieAntiRecommender import MovieAntiRecommender
 def data_paths():
     base_path = Path(__file__).parent.parent
     return {
-        "dataset": str(base_path / "data" / "clustered_dataset.csv"),
+        "dataset": str(base_path / "data" / "cleaned.csv"),
         "model": str(base_path / "data" / "movies_kmeans.pkl")
     }
 

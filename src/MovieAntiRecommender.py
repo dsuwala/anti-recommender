@@ -13,9 +13,12 @@ class MovieAntiRecommender:
 
     def load_dataset(self, name: str, model_name: str):
         self.dataset = pd.read_csv(name)
-        self.movies = self.dataset['title'].values
+        # self.movies = self.dataset['title'].values
         self.model = joblib.load(model_name)
         self.rating_quantiles = self.dataset['rating'].quantile([0.25, 0.75, 0.97]).to_numpy()
+
+        assert self.dataset.shape[0] == self.model.labels_.shape[0], "Dataset and model labels have different number of rows"
+        
     
 
     def standardize_title(self, movie_title, year=None):
@@ -92,11 +95,11 @@ class MovieAntiRecommender:
         farthers_cluster_center = self.model.cluster_centers_[farthers_cluster_idx]
 
 
-        possible_movies_low = self.dataset[(self.dataset["cluster"] == farthers_cluster_idx) & 
+        possible_movies_low = self.dataset[(self.model.labels_ == farthers_cluster_idx) & 
                                        (self.dataset["rating"] < self.rating_quantiles[0])]
-        possible_movies_mid = self.dataset[(self.dataset["cluster"] == farthers_cluster_idx) & 
+        possible_movies_mid = self.dataset[(self.model.labels_ == farthers_cluster_idx) & 
                                        (self.dataset["rating"] > self.rating_quantiles[1])]
-        possible_movies_high = self.dataset[(self.dataset["cluster"] == farthers_cluster_idx) & 
+        possible_movies_high = self.dataset[(self.model.labels_ == farthers_cluster_idx) & 
                                        (self.dataset["rating"] > self.rating_quantiles[2])]
         
         if len(possible_movies_low) > 0:
