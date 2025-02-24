@@ -1,7 +1,7 @@
 import pytest
 from fastapi.testclient import TestClient
-from unittest.mock import Mock, patch
-from main import app, RecommendationRequest
+from unittest.mock import patch
+from main import app
 
 client = TestClient(app)
 
@@ -50,4 +50,4 @@ def test_recommend_movies_invalid_request():
         json={}
     )
 
-    assert response.status_code == 422 # Validation error 
+    assert response.status_code == 422 
