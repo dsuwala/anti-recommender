@@ -40,7 +40,7 @@ class MovieAntiRecommender:
                 return {
                     "error": "Ambiguous or no match found",
                     "message": "No exact match found for that title and year. Check the year and try again.",
-                    "possible_matches": [(matching_titles.iloc[0]['standardized_title'], matched_year)]
+                    "possible_matches": [(str(matching_titles.iloc[0]['standardized_title']), int(matched_year))]
                 }
         elif len(matching_titles) == 1 and year is None:
             return matching_titles.index
@@ -49,7 +49,7 @@ class MovieAntiRecommender:
         matching_titles = np.array([str(title) for title in movie_titles if movie_title.lower() in title.lower()])
         matching_titles_ids = self.dataset[self.dataset['standardized_title'].isin(matching_titles)].index
         
-        print("first try:", matching_titles)
+        # print("first try:", matching_titles)
 
         # Second try: find close matches with low threshold
         if not np.any(matching_titles):
@@ -62,18 +62,18 @@ class MovieAntiRecommender:
 
         # If year is provided, filter matches by exact year
         if year is not None:
-            print("Filtering by year...")
+            # print("Filtering by year...")
             matching_titles = matching_titles[matching_titles_years == int(year)]
             matching_titles_ids = matching_titles_ids[matching_titles_years == int(year)]
-            print("second try:", matching_titles)
-            print("second try ids:", matching_titles_ids)
+            # print("second try:", matching_titles)
+            # print("second try ids:", matching_titles_ids)
 
         if len(matching_titles) != 1:
 
             return {
                 "error": "Ambiguous or no match found",
                 "message": "Please be more specific. Did you mean one of these?",
-                "possible_matches": list(zip(matching_titles, matching_titles_years)) 
+                "possible_matches": list(zip(matching_titles.tolist(), matching_titles_years.tolist()))
             }
         elif len(matching_titles) == 1 and year is not None:
             return matching_titles_ids
@@ -126,11 +126,12 @@ class MovieAntiRecommender:
 
         recommendations = recommendations.drop(['cluster', 'movieId'], axis=1)
         recommendations = recommendations.to_dict(orient='records')
+        recommendations = {"recommendations": recommendations}
 
         # Add best match to recommendations
-        recommendations.append({"query" :{
+        recommendations["query"] = {
             "title": self.dataset.iloc[movie_idx].title.values[0],
-            "rating": self.dataset.iloc[movie_idx].rating.values[0],
-            "year": self.dataset.iloc[movie_idx].year.values[0]
-        }})
+            "rating": float(self.dataset.iloc[movie_idx].rating.values[0]),
+            "year": int(self.dataset.iloc[movie_idx].year.values[0])
+        }
         return recommendations
