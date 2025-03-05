@@ -17,10 +17,9 @@ SHELL ["conda", "run", "-n", "antirecommender", "/bin/bash", "-c"]
 ADD src /app/src
 COPY run.py .
 COPY main.py .
-COPY .env .
 COPY config.py .
 
-# Expose port (we'll use the default from settings)
+# Expose port 8000
 EXPOSE 8000
 
 # Command to run the application using run.py
