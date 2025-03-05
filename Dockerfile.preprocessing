@@ -1,0 +1,16 @@
+FROM continuumio/miniconda3:latest
+
+WORKDIR /app
+
+# Create a new conda environment
+COPY environment.yml .
+RUN conda env create -f environment.yml
+
+# Make RUN commands use the new environment
+SHELL ["conda", "run", "-n", "antirecommender", "/bin/bash", "-c"]
+
+# Copy preprocessing code
+ADD src /app/src
+COPY preprocessing_cli.py .
+
+ENTRYPOINT ["conda", "run", "-n", "antirecommender", "python", "preprocessing_cli.py"]
