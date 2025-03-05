@@ -14,10 +14,7 @@ RUN conda env create -f environment.yml
 SHELL ["conda", "run", "-n", "antirecommender", "/bin/bash", "-c"]
 
 # Copy the rest of the application
-ADD src /app/src
-COPY run.py .
-COPY main.py .
-COPY config.py .
+COPY . .
 
 # Expose port 8000
 EXPOSE 8000
