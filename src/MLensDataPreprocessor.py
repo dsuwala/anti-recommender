@@ -6,15 +6,33 @@ from sklearn.cluster import KMeans
 
 class MLensDataPreprocessor:
     def __init__(self, pca_components=10, kmeans_clusters=300, working_dir="data"):
+        """
+        Initialize the MLensDataPreprocessor.
+
+        Args:
+            pca_components (int, optional): Number of components for PCA reduction.
+                Defaults to 10.
+            kmeans_clusters (int, optional): Number of clusters for KMeans clustering.
+                Defaults to 300.
+            working_dir (str, optional): Directory containing the data files.
+                Defaults to "data".
+        """
         self.pca_components = pca_components
         self.kmeans_clusters = kmeans_clusters
         self.working_dir = working_dir
 
     def standardize_title_and_year(self, title):
         """
-        Standardize movie title and extract year.
-        Input example: "Matrix, The (1999)" or "The Matrix (1999)" or "Matrix"
-        Returns: (standardized_title, year)
+        Standardize movie title and extract year from the title string.
+
+        Args:
+            title (str): Movie title in various formats (e.g., "Matrix, The (1999)",
+                "The Matrix (1999)", "Matrix")
+
+        Returns:
+            tuple: A tuple containing:
+                - str: Standardized title (e.g., "The Matrix")
+                - int or None: Year if present in title, None otherwise
         """
         # Extract year if present
         year = None
@@ -38,7 +56,15 @@ class MLensDataPreprocessor:
 
     def clean_movie_data(self, movies_df, ratings_df):
         """
-        Clean and preprocess movie and ratings data
+        Clean and preprocess movie and ratings data.
+
+        Args:
+            movies_df (pd.DataFrame): DataFrame containing movie information
+            ratings_df (pd.DataFrame): DataFrame containing rating information
+
+        Returns:
+            pd.DataFrame: Cleaned and preprocessed movie data with standardized titles,
+                years, and average ratings
         """
         # Calculate average rating per movie and filter out movies with no ratings
         ratings_df = ratings_df.drop(['timestamp', 'userId'], axis=1)
@@ -87,7 +113,14 @@ class MLensDataPreprocessor:
 
     def create_genre_matrix(self, movies_df):
         """
-        Create one-hot encoding matrix for genres
+        Create a one-hot encoding matrix for movie genres.
+
+        Args:
+            movies_df (pd.DataFrame): DataFrame containing movie information with genres
+
+        Returns:
+            np.ndarray: Binary matrix where each row represents a movie and each column
+                represents a genre (1 if movie has the genre, 0 otherwise)
         """
         genres_list = movies_df["genres"].str.split("|")
         num_movies = movies_df.shape[0]
@@ -103,7 +136,12 @@ class MLensDataPreprocessor:
 
     def preprocess_data(self):
         """
-        Main preprocessing pipeline
+        Main preprocessing pipeline for movie and ratings data.
+
+        Returns:
+            tuple: A tuple containing:
+                - pd.DataFrame: Cleaned and preprocessed movie data
+                - np.ndarray: Genre one-hot encoding matrix
         """
         # Load data
         movies_df = pd.read_csv(f"{self.working_dir}/movies.csv")
@@ -120,7 +158,14 @@ class MLensDataPreprocessor:
 
     def cluster_movies(self):
         """
-        Postprocess movies data using dimensionality reduction with PCA followed by KMeans clustering
+        Perform dimensionality reduction and clustering on movie data.
+
+        Returns:
+            tuple: A tuple containing:
+                - KMeans: Fitted KMeans clustering model
+                - dict: Statistics including:
+                    - PCA_cumulative_variance_ratio: Explained variance ratio
+                    - movies_per_cluster: Number of movies in each cluster
         """
 
         data = np.load(f"{self.working_dir}/genre_matrix.npy")

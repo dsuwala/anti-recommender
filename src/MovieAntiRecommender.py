@@ -2,16 +2,36 @@ import numpy as np
 import pandas as pd
 import joblib
 from difflib import get_close_matches
+from typing import Union
 
 
 class MovieAntiRecommender:
+    """
+    A class that recommends movies that are dissimilar to a given movie.
+    Uses clustering to find movies that are in the most distant cluster
+    and filters them by rating.
+    """
+
     def __init__(self):
+        """
+        Initialize MovieAntiRecommender with empty attributes.
+        """
         self.dataset = None
         self.model = None
         self.silhouette_avg = None
         self.rating_quantiles = None
 
     def load_dataset(self, name: str, model_name: str):
+        """
+        Load the movie dataset and pre-trained clustering model.
+
+        Args:
+            name (str): Path to the CSV file containing movie dataset
+            model_name (str): Path to the saved clustering model file
+
+        Raises:
+            AssertionError: If dataset size doesn't match model labels size
+        """
         self.dataset = pd.read_csv(name)
         # self.movies = self.dataset['title'].values
         self.model = joblib.load(model_name)
@@ -21,7 +41,18 @@ class MovieAntiRecommender:
                                 and model labels have different number of rows"
 
     def standardize_title(self, movie_title, year=None):
+        """
+        Find the exact movie in the dataset based on title and optional year.
 
+        Args:
+            movie_title (str): Title of the movie to search for
+            year (int, optional): Release year of the movie. Defaults to None.
+
+        Returns:
+            Union[pd.Index, dict]:
+                - pd.Index of matching movie if exact match found
+                - dict with error message and possible matches if ambiguous or no match
+        """
         if movie_title is None or movie_title == "":
             return {
                 "error": "No movie title provided",
@@ -81,7 +112,23 @@ class MovieAntiRecommender:
             return self.dataset[self.dataset['standardized_title'] == matching_titles[0]].index
 
     def recommend(self, movie_title, year=None):
+        """
+        Generate anti-recommendations for a given movie.
 
+        Finds movies from the most distant cluster that have either low, medium,
+        or high ratings.
+
+        Args:
+            movie_title (str): Title of the movie to base recommendations on
+            year (int, optional): Release year of the movie. Defaults to None.
+
+        Returns:
+            dict: Contains:
+                - recommendations: List of recommended movies with their details
+                - query: Details of the input movie that matched
+                OR
+                - error message and possible matches if movie not found
+        """
         movie_idx = self.standardize_title(movie_title, year)
 
         if isinstance(movie_idx, dict):
