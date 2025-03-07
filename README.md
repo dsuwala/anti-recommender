@@ -6,9 +6,8 @@ Out of the three predictions, the first one is from first quantile of average ra
 ## Technicalities 
 This code base is built on top of the [MovieLens dataset](https://grouplens.org/datasets/movielens/latest/). And uses KMeans clusterisation based on one-hot encoded movie genres to find movies of the farther "taste".
 Simoultaneously, It recomends the best rated movies if available and also worst rated. Due to the terms of use, the 
-dataset is not included in the repository, but you can download it from the [link](https://grouplens.org/datasets/movielens/latest/). 
-<!-- Then you can clean it by using `prototype.ipynb` notebook and then cluster data using `prototype_clusterisation.ipynb` notebook. When 
-you obtain `cleaned.csv` file and `kmeans_model.pkl` file, you can run the app. -->
+dataset is not included in the repository, but you can download it from the [link](https://grouplens.org/datasets/movielens/latest/). In the `data/metrics_clustering.csv` there are provided inertia and silhouette data for 
+cluster size scan in rage 15-620. Plots are provided in the `prototype_clusterization.ipynb` notebook.
 
 ## How to run
 
@@ -31,7 +30,7 @@ which will produce `archive/ml-latest/cleaned_movies.csv` file. Then run the fol
 sudo docker run -v /path/to/repository/antirecommender/archive/ml-latest:/app/data movie-preprocessor preprocess
 ```
 which will produce `kmeans.pkl` pickle file with fitted clusters. Those two files are necessary to launch the 
-antirecommendation model. <\br>
+antirecommendation model. <br>
 Preprocessing container takes more arguments and to see them you can use help information:
 ```bash
 sudo docker run movie-preprocessor cluster --help
