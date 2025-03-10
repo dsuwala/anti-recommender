@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Landing Page</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            text-align: center;
+            width: 100%;
+        }
+        .search-box {
+            margin-top: 100px; /* Adjust this value to pad more towards the upper edge */
+        }
+        input[type="text"] {
+            padding: 10px;
+            width: 300px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-left: 10px;
+            cursor: pointer;
+            background-color: #ffffff;
+            transition: background-color 0.2s
+        }
+        button:hover {
+            background-color: #f1f1f1;
+        }
+        button:active {
+            background-color: #e0e0e0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Search...">
+            <button onclick="handleSubmit()">Submit</button>
+        </div>
+    </div>
+
+    <script>
+        async function handleSubmit() {
+            const searchInput = document.getElementById('searchInput').value;
+            
+            try {
+                const response = await fetch('/api/recommend', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ query: searchInput })
+                });
+                
+                const data = await response.json();
+                console.log('Response:', data);
+                // Handle the response data here
+                
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+    </script>
+</body>
+
+</html>
