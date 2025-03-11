@@ -43,35 +43,112 @@
         button:active {
             background-color: #e0e0e0;
         }
+
+        .results-container {
+            margin-top: 20px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            display: none;  /* Hidden by default */
+        }
+
+        .results-container.visible {
+            display: block;
+        }
+
+        select {
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-left: 10px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="search-box">
             <input type="text" id="searchInput" placeholder="Search...">
+            <select id="yearSelect">
+                <option value="">Select Year (optional)</option>
+            </select>
             <button onclick="handleSubmit()">Submit</button>
+        </div>
+        <div id="resultContainer" class="results-container">
+            <h3>Results:</h3>
+            <div id="resultContent"></div>
         </div>
     </div>
 
     <script>
+        // Add this function to populate years
+        function populateYears() {
+            const yearSelect = document.getElementById('yearSelect');
+            const currentYear = new Date().getFullYear();
+            
+            // Add years from 1900 to current year
+            for (let year = currentYear; year >= 1900; year--) {
+                const option = document.createElement('option');
+                option.value = year;
+                option.textContent = year;
+                yearSelect.appendChild(option);
+            }
+        }
+
+        // Call it when page loads
+        populateYears();
+
         async function handleSubmit() {
             const searchInput = document.getElementById('searchInput').value;
+            const yearSelect = document.getElementById('yearSelect').value;
+            const resultContainer = document.getElementById('resultContainer');
+            const resultContent = document.getElementById('resultContent');
             
             try {
+                resultContent.innerHTML = 'Loading...';
+                resultContainer.classList.add("visible");
+
                 const response = await fetch('/api/recommend', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ query: searchInput })
+                    body: JSON.stringify({ 
+                        query: searchInput,
+                        year: yearSelect || null  // Include year if selected
+                    })
                 });
                 
                 const data = await response.json();
                 console.log('Response:', data);
-                // Handle the response data here
+                
+                // Handle ambiguous cases
+                if (data.possible_matches) {
+                    resultContent.innerHTML = `
+                        <p>Did you mean one of these?</p>
+                        <ul style="list-style-type: none; padding: 0;">
+                            ${data.possible_matches.map(match => `<li style="margin-bottom: 10px;">${match}</li>`).join('')}
+                        </ul>
+                    `;
+                }
+                // Handle regular results
+                else if (data.results && data.results.length > 0) {
+                    resultContent.innerHTML = `
+                        <ul style="list-style-type: none; padding: 0;">
+                            ${data.results.map(result => `<li style="margin-bottom: 10px;">${result}</li>`).join('')}
+                        </ul>
+                    `;
+                } else {
+                    resultContent.innerHTML = 'No results found';
+                }
                 
             } catch (error) {
                 console.error('Error:', error);
+                resultContent.innerHTML = 'An error occurred';
             }
         }
     </script>
