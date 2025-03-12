@@ -1,0 +1,19 @@
+version: '3.8'
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile.frontend
+    ports:
+      - "5000:5000"
+    depends_on:
+      - backend
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.run
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./archive/ml-latest:/app/data

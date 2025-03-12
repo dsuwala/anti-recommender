@@ -1,0 +1,34 @@
+# Use the official conda image as base
+FROM continuumio/miniconda3
+
+# Set working directory
+WORKDIR /app
+
+# Copy environment.yml file
+COPY frontend/environment-frontend.yml .
+
+# Create conda environment
+RUN conda env create -f environment-frontend.yml
+
+# Make RUN commands use the new environment
+SHELL ["conda", "run", "-n", "antirecommender-frontend", "/bin/bash", "-c"]
+
+COPY . .
+
+# Create a non-root user for security
+RUN useradd -m appuser && \
+    chown -R appuser:appuser /app
+USER appuser
+
+# Expose port 8000
+EXPOSE 8000
+EXPOSE 5000
+
+# Use gunicorn with production settings
+CMD ["conda", "run", "-n", "antirecommender-frontend", "gunicorn", \
+     "--bind", "0.0.0.0:5000", \
+     "--workers", "3", \
+     "--timeout", "60", \
+     "--access-logfile", "-", \
+     "--error-logfile", "-", \
+     "frontend.frontend_main:app"]

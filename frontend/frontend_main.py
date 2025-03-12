@@ -8,6 +8,9 @@ def hello_world():
     return render_template("index.html")
 
 
+BACKEND_URL = "http://backend:8000"
+
+
 @app.route("/api/recommend", methods=["POST"])
 def recommend():
     data = request.json
@@ -21,7 +24,7 @@ def recommend():
 
     # Make request to the recommender API
     response = requests.post(
-        "http://localhost:8000/recommend",
+        f"{BACKEND_URL}/recommend",
         json=json
     )
 
@@ -46,4 +49,4 @@ def recommend():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=False)
