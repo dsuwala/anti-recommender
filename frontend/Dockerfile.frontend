@@ -5,7 +5,7 @@ FROM continuumio/miniconda3
 WORKDIR /app
 
 # Copy environment.yml file
-COPY frontend/environment-frontend.yml .
+COPY environment-frontend.yml .
 
 # Create conda environment
 RUN conda env create -f environment-frontend.yml

@@ -12,7 +12,7 @@ services:
   backend:
     build:
       context: .
-      dockerfile: Dockerfile.run
+      dockerfile: clustering-engine/Dockerfile.run
     ports:
       - "8000:8000"
     volumes:

@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import joblib
 from difflib import get_close_matches
-from typing import Union
+from rapidfuzz import process, fuzz
 
 
 class MovieAntiRecommender:
@@ -175,3 +175,18 @@ class MovieAntiRecommender:
             "year": int(self.dataset.iloc[movie_idx].year.values[0])
         }
         return recommendations
+
+    def search_suggestions(self, query):
+        """
+        Search for movies that match the query.
+
+        Args:
+            query (str): The query to search for
+
+        Returns:
+            list: List of movies that match the query
+        """
+        movie_titles = self.dataset['standardized_title'].values
+        matches = process.extract(query, movie_titles, scorer=fuzz.token_set_ratio, limit=10)
+
+        return [f"{match[0]} ({self.dataset.loc[match[0], 'year']})" for match in matches]
