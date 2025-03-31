@@ -15,9 +15,13 @@ SHELL ["conda", "run", "-n", "antirecommender", "/bin/bash", "-c"]
 
 # Copy the rest of the application
 COPY . .
+# ADD ./src /app/src
+# ADD ./config.py /app/config.py
+# ADD ./run.py /app/run.py
+# ADD ./main.py /app/main.py
 
 # Expose port 8000
 EXPOSE 8000
 
 # Command to run the application using run.py
-CMD ["conda", "run", "-n", "antirecommender", "python", "run.py"] 
+CMD ["conda", "run", "--no-capture-output", "-n", "antirecommender", "python", "run.py"] 

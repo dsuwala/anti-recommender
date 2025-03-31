@@ -188,5 +188,20 @@ class MovieAntiRecommender:
         """
         movie_titles = self.dataset['standardized_title'].values
         matches = process.extract(query, movie_titles, scorer=fuzz.token_set_ratio, limit=10)
+        matches = np.array([match[0] for match in matches])
+        print(matches)
 
-        return [f"{match[0]} ({self.dataset.loc[match[0], 'year']})" for match in matches]
+        # get year for each suggestion match. Titles can be repeated with different years.
+        # if multiple years, append all repeated titles to the suggestion before moving to the next title
+        suggestions_list = []
+        suggestions_limit = 6
+        for match in matches:
+            suggestions_year = self.dataset[self.dataset['standardized_title'] == match]['year'].values
+
+            if len(suggestions_year) > 1:
+                for year in suggestions_year:
+                    suggestions_list.append(f"{match} ({year})")
+            else:
+                suggestions_list.append(f"{match} ({suggestions_year[0]})")
+
+        return suggestions_list[:suggestions_limit]

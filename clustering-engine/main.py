@@ -23,9 +23,11 @@ def get_recommender():
     if not hasattr(get_recommender, "instance"):
         try:
             logger.info("Initializing recommender...")
+            logger.info(f"Ititializing with data path: {settings.data_path} and model path: {settings.model_path}")
             recommender = MovieAntiRecommender()
             recommender.load_dataset(settings.data_path, settings.model_path)
             logger.info("Recommender initialized successfully")
+            logger.info(f"Using dataset: {settings.data_path} and model: {settings.model_path}")
             get_recommender.instance = recommender
         except Exception as e:
             logger.error(f"Error initializing recommender: {e}")
@@ -65,6 +67,6 @@ def search_suggestions(query: str, recommender: MovieAntiRecommender = Depends(g
         suggestions = recommender.search_suggestions(query)
         logger.info(f"Suggestions: {suggestions}")
         return {"suggestions": suggestions}
-    except Exception:
-        logger.error("An unexpected error occurred")
-        return {"error": "An unexpected error occurred"}
+    except Exception as e:
+        logger.error(f"Error searching suggestions: {e}")
+        return {"error": str(e)}

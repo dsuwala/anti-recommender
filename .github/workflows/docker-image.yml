@@ -15,4 +15,5 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Build the Docker image
-      run: docker build . --file clustering-engine/Dockerfile.run --tag antirecommender:$(date +%s)
+      working-directory: ./clustering-engine
+      run: docker build . --file Dockerfile.run --tag antirecommender:$(date +%s)
