@@ -11,9 +11,11 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./clustering-engine
 
     steps:
     - uses: actions/checkout@v4
     - name: Build the Docker image
-      working-directory: ./clustering-engine
       run: docker build . --file Dockerfile.run --tag antirecommender:$(date +%s)
