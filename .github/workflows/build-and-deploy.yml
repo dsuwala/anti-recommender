@@ -1,0 +1,63 @@
+name: CI/CD Pipeline for Cloud Run
+
+env:
+  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
+  SVC_ACCOUNT_NAME: ${{ secrets.GCP_SVC_ACCOUNT_NAME }}
+  SVC_ACCOUNT_EMAIL: ${{ secrets.GCP_SVC_ACCOUNT_NAME }}@${{ secrets.GCP_PROJECT_ID }}.iam.gserviceaccount.com
+  SVC_RUNNER_ACCOUNT_EMAIL: ${{ secrets.GCP_RUNNER_SVC_ACCOUNT_NAME }}@${{ secrets.GCP_PROJECT_ID }}.iam.gserviceaccount.com
+  STORAGE_BUCKET_NAME: ${{ secrets.GCS_BUCKET_NAME }}
+  DOCKER_REPO: my-repo
+  DOCKER_IMAGE: antirecommender
+  CLOUD_RUN_SERVICE: antrecommender
+  REGION: europe-central2
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'clustering-engine/**'
+
+permissions:
+  contents: 'read'
+  id-token: 'write'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest 
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v3 
+
+    - name: Authenticate to Google Cloud
+      env:
+        GOOGLE_APPLICATION_CREDENTIALS_JSON: ${{ env.SVC_ACCOUNT_KEY }}
+      run: |
+        echo "$GOOGLE_APPLICATION_CREDENTIALS_JSON" | base64 --decode | gcloud auth activate-service-account ${{ env.SVC_ACCOUNT_EMAIL}} --key-file=-
+        gcloud config set project ${{ env.PROJECT_ID }}
+        gcloud config set run/region ${{ env.REGION }}
+
+
+    - name: Authenticate Docker for Google Artifact Registry
+      run: |
+        gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev
+
+    - name: Build and Tag Docker Image
+      run: |
+        docker build -t ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.DOCKER_REPO }}/${{ env.DOCKER_IMAGE }} .
+        docker tag ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.DOCKER_REPO }}/${{ env.DOCKER_IMAGE }} ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.DOCKER_REPO }}/${{ env.DOCKER_IMAGE }}:latest 
+
+    - name: Push Docker Image to Google Artifact Registry
+      run: |
+        docker push ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.DOCKER_REPO }}/${{ env.DOCKER_IMAGE }}:latest 
+
+    - name: Deploy to Google Cloud Run
+      run: |
+        gcloud run deploy ${{ env.CLOUD_RUN_SERVICE }} \
+          --image=${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.DOCKER_REPO }}/${{ env.DOCKER_IMAGE }}:latest \
+          --region=${{ env.REGION }} \
+          --platform=managed \
+          --service-account=${{ env.SVC_RUNNER_ACCOUNT_EMAIL }} \
+          --no-allow-unauthenticated
