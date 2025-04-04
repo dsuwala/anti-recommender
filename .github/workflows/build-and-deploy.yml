@@ -44,6 +44,7 @@ jobs:
         gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev
 
     - name: Build and Tag Docker Image
+      working-directory: clustering-engine
       run: |
         docker build -t ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.DOCKER_REPO }}/${{ env.DOCKER_IMAGE }} -f Dockerfile.run .
         docker tag ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.DOCKER_REPO }}/${{ env.DOCKER_IMAGE }} ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.DOCKER_REPO }}/${{ env.DOCKER_IMAGE }}:latest 
