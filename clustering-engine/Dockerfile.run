@@ -15,13 +15,12 @@ SHELL ["conda", "run", "-n", "antirecommender", "/bin/bash", "-c"]
 
 # Copy the rest of the application
 COPY . .
-# ADD ./src /app/src
-# ADD ./config.py /app/config.py
-# ADD ./run.py /app/run.py
-# ADD ./main.py /app/main.py
+RUN apt-get update && apt-get install -y gcsfuse
 
-# Expose port 8000
-EXPOSE 8000
+# Expose port 8080
+EXPOSE 8080
+VOLUME ["/app/data"]
 
 # Command to run the application using run.py
-CMD ["conda", "run", "--no-capture-output", "-n", "antirecommender", "python", "run.py"] 
+#CMD ["conda", "run", "--no-capture-output", "-n", "antirecommender", "python", "run.py"] 
+CMD ["/app/entrypoint.sh"]
