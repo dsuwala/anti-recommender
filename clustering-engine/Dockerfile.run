@@ -15,7 +15,13 @@ SHELL ["conda", "run", "-n", "antirecommender", "/bin/bash", "-c"]
 
 # Copy the rest of the application
 COPY . .
-RUN apt-get update && apt-get install -y gcsfuse
+
+# Install gcsfuse
+RUN apt-get update && apt-get install lsb-core
+RUN echo "deb https://packages.cloud.google.com/apt gcsfuse-$(lsb_release -c -s) main" | tee /etc/apt/sources.list.d/gcsfuse.list
+RUN curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
+RUN apt-get update
+RUN yes | apt-get install fuse gcsfuse
 
 # Expose port 8080
 EXPOSE 8080
