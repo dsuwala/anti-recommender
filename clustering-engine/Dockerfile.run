@@ -3,6 +3,7 @@ FROM continuumio/miniconda3
 
 # Set working directory
 WORKDIR /app
+RUN mkdir -p /app/data
 
 # Copy environment.yml file
 COPY environment.yml .
