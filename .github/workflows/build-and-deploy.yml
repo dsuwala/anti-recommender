@@ -2,7 +2,6 @@ name: CI/CD Pipeline for Cloud Run
 
 env:
   PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
-  SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
   SVC_ACCOUNT_NAME: ${{ secrets.GCP_SVC_ACCOUNT_NAME }}
   SVC_ACCOUNT_EMAIL: ${{ secrets.GCP_SVC_ACCOUNT_NAME }}@${{ secrets.GCP_PROJECT_ID }}.iam.gserviceaccount.com
   SVC_RUNNER_ACCOUNT_EMAIL: ${{ secrets.GCP_RUNNER_SVC_ACCOUNT_NAME }}@${{ secrets.GCP_PROJECT_ID }}.iam.gserviceaccount.com
@@ -18,6 +17,7 @@ on:
       - main
     paths:
       - 'clustering-engine/**'
+  workflow_dispatch: 
 
 permissions:
   contents: 'read'
@@ -33,12 +33,11 @@ jobs:
 
     - name: Authenticate to Google Cloud
       env:
-        GOOGLE_APPLICATION_CREDENTIALS_JSON: ${{ env.SVC_ACCOUNT_KEY }}
+        GOOGLE_APPLICATION_CREDENTIALS_JSON: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
       run: |
         echo "$GOOGLE_APPLICATION_CREDENTIALS_JSON" | base64 --decode | gcloud auth activate-service-account ${{ env.SVC_ACCOUNT_EMAIL}} --key-file=-
         gcloud config set project ${{ env.PROJECT_ID }}
         gcloud config set run/region ${{ env.REGION }}
-
 
     - name: Authenticate Docker for Google Artifact Registry
       run: |
