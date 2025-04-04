@@ -10,9 +10,6 @@ COPY environment.yml .
 # Create conda environment
 RUN conda env create -f environment.yml
 
-# Make RUN commands use the new environment
-SHELL ["conda", "run", "-n", "antirecommender", "/bin/bash", "-c"]
-
 # Copy the rest of the application
 COPY . .
 
