@@ -3,7 +3,7 @@ FROM continuumio/miniconda3
 
 # Set working directory
 WORKDIR /app
-RUN mkdir -p /app/data
+# RUN mkdir -p /app/data
 
 # Copy environment.yml file
 COPY environment.yml .
@@ -15,18 +15,18 @@ RUN conda env create -f environment.yml
 COPY . .
 
 # Install gcsfuse
-RUN apt-get update && apt-get install -y curl gnupg lsb-release
-RUN echo "deb https://packages.cloud.google.com/apt gcsfuse-$(lsb_release -c -s) main" | tee /etc/apt/sources.list.d/gcsfuse.list
-RUN curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
-RUN apt-get update && apt-get install -y fuse gcsfuse
+# RUN apt-get update && apt-get install -y curl gnupg lsb-release
+# RUN echo "deb https://packages.cloud.google.com/apt gcsfuse-$(lsb_release -c -s) main" | tee /etc/apt/sources.list.d/gcsfuse.list
+# RUN curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
+# RUN apt-get update && apt-get install -y fuse gcsfuse
 
 # Make entrypoint script executable
-RUN chmod +x /app/entrypoint.sh
+# RUN chmod +x /app/entrypoint.sh
 
 # Expose port 8080
 EXPOSE 8080
-VOLUME ["/app/data"]
+# VOLUME ["/app/data"]
 
 # Command to run the application using run.py
-#CMD ["conda", "run", "--no-capture-output", "-n", "antirecommender", "python", "run.py"] 
-CMD ["/app/entrypoint.sh"]
+CMD ["conda", "run", "--no-capture-output", "-n", "antirecommender", "python", "run.py"] 
+# CMD ["/app/entrypoint.sh"]

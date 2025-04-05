@@ -33,8 +33,8 @@ class MovieAntiRecommender:
             AssertionError: If dataset size doesn't match model labels size
         """
         self.dataset = pd.read_csv(name)
-        # self.movies = self.dataset['title'].values
         self.model = joblib.load(model_name)
+
         self.rating_quantiles = self.dataset['rating'].quantile([0.25, 0.75, 0.97]).to_numpy()
 
         assert self.dataset.shape[0] == self.model.labels_.shape[0], "Dataset \

@@ -5,7 +5,8 @@ env:
   SVC_ACCOUNT_NAME: ${{ secrets.GCP_SVC_ACCOUNT_NAME }}
   SVC_ACCOUNT_EMAIL: ${{ secrets.GCP_SVC_ACCOUNT_NAME }}@${{ secrets.GCP_PROJECT_ID }}.iam.gserviceaccount.com
   SVC_RUNNER_ACCOUNT_EMAIL: ${{ secrets.GCP_RUNNER_SVC_ACCOUNT_NAME }}@${{ secrets.GCP_PROJECT_ID }}.iam.gserviceaccount.com
-  STORAGE_BUCKET_NAME: ${{ secrets.GCS_BUCKET_NAME }}
+  GEN_REPO_NAME: general-repo
+  GEN_REPO_LOCATION: europe
   DOCKER_REPO: my-repo
   DOCKER_IMAGE: antirecommender
   CLOUD_RUN_SERVICE: antrecommender
@@ -42,6 +43,17 @@ jobs:
     - name: Authenticate Docker for Google Artifact Registry
       run: |
         gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev
+    
+    - name: Download and extract databases
+      working-directory: clustering-engine
+      run: |
+        gcloud artifacts files download \
+          --project=${{ env.PROJECT_ID }} \
+          --location=${{ env.GEN_REPO_LOCATION }} \
+          --repository=${{ env.GEN_REPO_NAME }} \
+          --destination=. \
+          antirecommender-data:v1.0:antirecommender-data.tar.gz
+        tar -xzvf antirecommender-data.tar.gz
 
     - name: Build and Tag Docker Image
       working-directory: clustering-engine
@@ -58,7 +70,6 @@ jobs:
         gcloud run deploy ${{ env.CLOUD_RUN_SERVICE }} \
           --image=${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.DOCKER_REPO }}/${{ env.DOCKER_IMAGE }}:latest \
           --region=${{ env.REGION }} \
-          --set-env-vars=GCS_BUCKET_NAME=${{ env.STORAGE_BUCKET_NAME }} \
           --platform=managed \
           --service-account=${{ env.SVC_RUNNER_ACCOUNT_EMAIL }} \
           --no-allow-unauthenticated
