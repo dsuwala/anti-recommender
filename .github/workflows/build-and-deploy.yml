@@ -53,7 +53,7 @@ jobs:
           --repository=${{ env.GEN_REPO_NAME }} \
           --destination=. \
           antirecommender-data:v1.0:antirecommender-data.tar.gz
-        tar -xzvf antirecommender-data:v1.0:antirecommender-data.tar.gz
+        tar -xzvf antirecommender-data%3Av1.0%3Aantirecommender-data.tar.gz
 
     - name: Build and Tag Docker Image
       working-directory: clustering-engine
