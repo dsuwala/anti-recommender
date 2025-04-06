@@ -64,52 +64,55 @@ class MovieAntiRecommender:
         # zeroth try: exact match if query is directly the name of
         # the movie with proper spelling up to a case difference
         matching_condition = self.dataset['standardized_title'].str.lower() == movie_title.lower()
+        if year is not None:
+            matching_condition &= self.dataset['year'].astype(int) == int(year)
         matching_titles = self.dataset[matching_condition]
         matching_titles_ids = matching_titles.index
-        # print(matching_titles)
 
-        # If year is provided, check if it matches the year of the exact title match
-        if year is not None and len(matching_titles) == 1:
-            matched_year = self.dataset.loc[matching_titles.index[0], 'year']
-            if matched_year != int(year):
-                return {
-                    "error": "Ambiguous or no match found",
-                    "message": "No exact match found for that title and year. Check the year and try again.",
-                    "possible_matches": [(str(matching_titles.iloc[0]['standardized_title']), int(matched_year))]
-                }
-        elif len(matching_titles) == 1 and year is None:
+        if len(matching_titles) == 1:
             return matching_titles.index
 
         # First try: exact match after lowercasing for movies which contains the query
-        matching_titles = np.array([str(title) for title in movie_titles if movie_title.lower() in title.lower()])
-        matching_titles_ids = self.dataset[self.dataset['standardized_title'].isin(matching_titles)].index
+        matching_titles = np.array([str(title) for title in movie_titles
+                                  if movie_title.lower() in title.lower()])
+        if len(matching_titles) > 0:
+            matching_titles_ids = self.dataset[self.dataset['standardized_title'].isin(matching_titles)].index
+            if year is not None:
+                year_filter = self.dataset.loc[matching_titles_ids, 'year'].astype(int) == int(year)
+                matching_titles_ids = matching_titles_ids[year_filter]
 
         # Second try: find close matches with low threshold
-        if not np.any(matching_titles):
+        if len(matching_titles_ids) == 0:
             print("No exact match found. Searching for close matches...")
-            matches = get_close_matches(movie_title.lower(), [t.lower() for t in movie_titles], n=5, cutoff=0.6)
-            matching_titles = np.array([title for title in movie_titles if title.lower() in matches])
-            matching_titles_ids = self.dataset[self.dataset['standardized_title'].isin(matching_titles)].index
+            matches = get_close_matches(movie_title.lower(),
+                                     [t.lower() for t in movie_titles],
+                                     n=5, cutoff=0.6)
+            matching_titles = np.array([title for title in movie_titles
+                                      if title.lower() in matches])
+            if len(matching_titles) > 0:
+                matching_titles_ids = self.dataset[self.dataset['standardized_title'].isin(matching_titles)].index
+                if year is not None:
+                    year_filter = self.dataset.loc[matching_titles_ids, 'year'].astype(int) == int(year)
+                    matching_titles_ids = matching_titles_ids[year_filter]
 
-        matching_titles_years = self.dataset[self.dataset['standardized_title'].isin(matching_titles)]['year'].values
-        matching_titles_years = np.int32(matching_titles_years)
-
-        # If year is provided, filter matches by exact year
-        if year is not None:
-            matching_titles = matching_titles[matching_titles_years == int(year)]
-            matching_titles_ids = matching_titles_ids[matching_titles_years == int(year)]
-
-        if len(matching_titles) != 1:
-
+        if len(matching_titles_ids) == 0:
             return {
-                "error": "Ambiguous or no match found",
+                "error": "No matches found",
+                "message": "No movies found matching your criteria.",
+                "possible_matches": []
+            }
+
+        matching_titles = self.dataset.loc[matching_titles_ids, 'standardized_title'].values
+        matching_titles_years = self.dataset.loc[matching_titles_ids, 'year'].values.astype(int)
+
+        if len(matching_titles) > 1:
+            return {
+                "error": "Ambiguous match found",
                 "message": "Please be more specific. Did you mean one of these?",
                 "possible_matches": list(zip(matching_titles.tolist(), matching_titles_years.tolist()))
             }
-        elif len(matching_titles) == 1 and year is not None:
-            return matching_titles_ids
-        else:
-            return self.dataset[self.dataset['standardized_title'] == matching_titles[0]].index
+
+        return matching_titles_ids
 
     def recommend(self, movie_title, year=None):
         """
