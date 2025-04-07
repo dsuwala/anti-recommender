@@ -25,7 +25,7 @@ jobs:
     - name: Install dependencies
       working-directory: clustering-engine
       run: |
-        conda env update --file antirecommender_test_full.yml --name base
+        conda env update --file environment.yml --name base
     - name: Lint with flake8
       working-directory: clustering-engine
       run: |

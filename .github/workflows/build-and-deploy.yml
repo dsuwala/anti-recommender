@@ -13,11 +13,12 @@ env:
   REGION: europe-central2
 
 on:
-  # push:
-  #   branches:
-  #     - master
-  #   paths:
-  #     - 'clustering-engine/**'
+  workflow_run:
+    workflows: ["Test Antirecommender"]
+    types:
+      - completed
+    branches:
+      - master
   workflow_dispatch: 
 
 permissions:
