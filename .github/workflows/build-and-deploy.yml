@@ -13,11 +13,11 @@ env:
   REGION: europe-central2
 
 on:
-  push:
-    branches:
-      - master
-    paths:
-      - 'clustering-engine/**'
+  # push:
+  #   branches:
+  #     - master
+  #   paths:
+  #     - 'clustering-engine/**'
   workflow_dispatch: 
 
 permissions:
