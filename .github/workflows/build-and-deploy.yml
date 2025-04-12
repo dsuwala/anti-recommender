@@ -1,4 +1,4 @@
-name: CI/CD Pipeline for Cloud Run
+name: Build and deploy to GCP
 
 env:
   PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
